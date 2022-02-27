@@ -99,6 +99,7 @@ import Button from '@mui/material/Button';
 
 
 import React from "react";
+import { height } from '@mui/system';
 
 class MemeGenerator extends React.Component {
   state = {
@@ -143,45 +144,42 @@ class MemeGenerator extends React.Component {
   render() {
     return (
 
-        // <><Box
-        //     component="form"
-        //     sx={{
-        //         '& > :not(style)': { m: 1, width: '25ch' },
-        //     }}
-        //     noValidate
-        //     autoComplete="off"
+       
+      <Box sx={{display: 'flex',
+                flexDirection: 'row',
+                marginTop: '32px',
+                marginLeft: '32px'}}>
+        <form className="meme-form" onSubmit={this.handleSubmit}> 
+            <Box sx={{display: 'flex',
+                flexDirection: 'column'}}>
             
-        // >
-        //     <TextField id="outlined-basic" label="Text Top" variant="outlined"
-        //         value={this.state.topText}
-        //         name="topText"
-        //         onChange={this.handleChange} />
-        //     <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
-        //         value={this.state.bottomText}
-        //         name="bottomText"
-        //         onChange={this.handleChange} />
-        //     <Button onSubmit={this.handleSubmit}>Generate</Button>
-        // </Box><Box>
-        //         <img src={this.state.randomImg} alt="meme" />
-        //     </Box></>
-      <div>
-        <form className="meme-form" onSubmit={this.handleSubmit}>
-          <TextField id="outlined-basic" label="Text Top" variant="outlined"
-            placeholder="Enter Text"
-            type="text"
-            value={this.state.topText}
-            name="topText"
-            onChange={this.handleChange}
-          />
-          <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
-            placeholder="Enter Text"
-            type="text"
-            value={this.state.bottomText}
-            name="bottomText"
-            onChange={this.handleChange}
-          />
-          <button>Generate</button>
+                <TextField id="outlined-basic" label="Text Top" variant="outlined"
+                    type="text"
+                    value={this.state.topText}
+                    name="topText"
+                    onChange={this.handleChange}
+                    style={{marginBottom: '16px',
+                           marginRight: '16px'}}
+                />
+                <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
+                    type="text"
+                    value={this.state.bottomText}
+                    name="bottomText"
+                    onChange={this.handleChange}
+                    style={{marginBottom: '16px',
+                           marginRight: '16px'}}
+                />
+                <button style={{
+                    marginBottom: '16px',
+                    marginRight: '16px',
+                    height: '40px',
+                    textTransform: 'uppercase'
+                }}>Generate
+                </button>
+            </Box>
         </form>
+       
+        
 
         <br />
         <div className="meme">
@@ -189,7 +187,7 @@ class MemeGenerator extends React.Component {
           <h2 className="top">{this.state.topText}</h2>
           <h2 className="bottom">{this.state.bottomText}</h2>
         </div>
-      </div>
+      </Box>
     );
   }
 }
