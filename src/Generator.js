@@ -1,195 +1,146 @@
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import Axios from "axios";
+import domtoimage from "dom-to-image";
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { IconButton } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
-// export default function MemeGenerator() {
-//     const [loading, setLoading] = useState(false);
-//     const [topText, setTopText] = useState('');
-//     const [bottomText, setBottomText] = useState('');
-//     const [allMemeImgs, setAllMemeImgs] = useState([]);
-//     const [randomImg, setRandomImg] = useState("http://i.imgflip.com/1bij.jpg")
+function MemeGenerator() {
+  const [currentMemeIdx, setCurrentMemeIdx] = useState(0);
+  const [memeData, setMemeData] = useState([]);
+  const [text, setText] = useState(["Sample text 1", "Sample text 2"]);
+  const [ownImageSrc, setOwnImageSrc] = useState("");
 
-//     //fetch data
-//     useEffect(()=>{
-//         setLoading(true);
-//         axios
-//         .get('https://api.imgflip.com/get_memes')
-//         .then((res) => {
-//             console.log(res)
-//             setAllMemeImgs(res.data.memes)
-           
-//             setLoading(false)
-//         })
-//         .catch((error) => console.log(error))
-//     }, []);
-    
-//     //set Text
-//     const handleChange = event => {
-//         setTopText(topText);
-//         setBottomText(bottomText);
-//     }
-
-//     const handleSubmit = event =>{
-//         event.preventDefault();
-//         if(allMemeImgs) {
-//         console.log(allMemeImgs)
-//         const random = allMemeImgs[Math.floor(Math.random() * allMemeImgs.length)].url;
-//         setRandomImg(random)
-//         console.log(random) 
-//         } else console.log ("Loading...")
-        
-
-//     }
-
-//   return (
-//     <div>
-//     <form className="meme-form" onSubmit={handleSubmit}>
-//       <input
-//         placeholder="Enter Text"
-//         type="text"
-//         value={topText}
-//         name="topText"
-//         onChange={handleChange}
-//       />
-//       <input
-//         placeholder="Enter Text"
-//         type="text"
-//         value={bottomText}
-//         name="bottomText"
-//         onChange={handleChange}
-//       />
-//       <button>Generate</button>
-//     </form>
-
-//     <br />
-//     <div className="meme">
-//       <img src={randomImg} alt="meme" />
-//       <h2 className="top">{topText}</h2>
-//       <h2 className="bottom">{bottomText}</h2>
-//     </div>
-//   </div>
-// //    <>
-// //    <Box
-// //       component="form"
-// //       sx={{
-// //         '& > :not(style)': { m: 1, width: '25ch' },
-// //       }}
-// //       noValidate
-// //       autoComplete="off"
-// //       onSubmit={handleSubmit}
-// //     >
-// //       <TextField id="outlined-basic" label="Text Top" variant="outlined" 
-// //       value={topText}
-// //       name="topText"
-// //       onChange={handleChange}/>
-// //       <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
-// //       value={bottomText}
-// //       name="bottomText"
-// //       onChange={handleChange} />
-// //     <Button >Generate</Button>
-// //     </Box>
-// //     <Box>
-// //     <img src={randomImg} alt="meme" />
-// //     </Box>
-// //    </>
-//   )
-// }
-
-
-import React from "react";
-import { height } from '@mui/system';
-
-class MemeGenerator extends React.Component {
-  state = {
-    loading: false,
-    topText: "",
-    bottomText: "",
-    allMemeImgs: [],
-    randomImg: "http://i.imgflip.com/1bij.jpg"
-  };
-  componentDidMount() {
-    this.setState({
-      loading: true
-    });
-
-    fetch("https://api.imgflip.com/get_memes")
-      .then(response => response.json())
-      .then(content =>
-        this.setState({
-          allMemeImgs: content.data.memes,
-          loading: false
-        })
-      );
-  }
-
-  handleChange = event => {
-    const { name, value } = event.target;
-
-    this.setState({
-      [name]: value
-    });
-  };
-  handleSubmit = event => {
-    event.preventDefault();
-    const { allMemeImgs } = this.state;
-    const rand =
-      allMemeImgs[Math.floor(Math.random() * allMemeImgs.length)].url;
-    this.setState({
-      randomImg: rand
-    });
-  };
-
-  render() {
-    return (
-
-       
-      <Box sx={{display: 'flex',
-                flexDirection: 'row',
-                marginTop: '32px',
-                marginLeft: '32px'}}>
-        <form className="meme-form" onSubmit={this.handleSubmit}> 
-            <Box sx={{display: 'flex',
-                flexDirection: 'column'}}>
-            
-                <TextField id="outlined-basic" label="Text Top" variant="outlined"
-                    type="text"
-                    value={this.state.topText}
-                    name="topText"
-                    onChange={this.handleChange}
-                    style={{marginBottom: '16px',
-                           marginRight: '16px'}}
-                />
-                <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
-                    type="text"
-                    value={this.state.bottomText}
-                    name="bottomText"
-                    onChange={this.handleChange}
-                    style={{marginBottom: '16px',
-                           marginRight: '16px'}}
-                />
-                <button style={{
-                    marginBottom: '16px',
-                    marginRight: '16px',
-                    height: '40px',
-                    textTransform: 'uppercase'
-                }}>Generate
-                </button>
-            </Box>
-        </form>
-       
-        
-
-        <br />
-        <div className="meme">
-          <img src={this.state.randomImg} alt="meme" />
-          <h2 className="top">{this.state.topText}</h2>
-          <h2 className="bottom">{this.state.bottomText}</h2>
-        </div>
-      </Box>
+  const getMemeData = () => {
+    Axios.get(`https://api.imgflip.com/get_memes`).then((resp) =>
+      setMemeData(resp.data.data.memes)
     );
-  }
+  };
+
+  useEffect(() => getMemeData(), []);
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const reader = new FileReader();
+    reader.onabort = () => console.log("File reading was aborted");
+    reader.onerror = () => console.log("File reading has failed");
+    reader.onload = () => setOwnImageSrc(() => reader.result);
+    reader.readAsDataURL(acceptedFiles[0]);
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  const onPrev = () => {
+    if (currentMemeIdx === 0) return;
+    setOwnImageSrc(() => "");
+    setCurrentMemeIdx((prev) => prev - 1);
+  };
+
+  const onRandom = () => {
+    const newIdx = Math.floor(Math.random() * memeData.length);
+    setCurrentMemeIdx((prev) => newIdx);
+  };
+
+  const onNext = () => {
+    if (currentMemeIdx >= memeData.count - 1) return;
+    setOwnImageSrc(() => "");
+    setCurrentMemeIdx((prev) => prev + 1);
+  };
+
+  const onExport = () => {
+    let imgDiv = document.getElementById("img-container");
+    domtoimage
+      .toPng(imgDiv)
+      .then((url) => {
+        var link = document.createElement("a");
+        link.download = "my-meme.png";
+        link.href = url;
+        link.click();
+      })
+      .catch((e) => console.log(e));
+  };
+
+  const handleTextChange = (value, idx) => {
+    setText((prev) => [
+      ...prev.slice(0, idx),
+      value,
+      ...prev.slice(idx + 1),
+    ]);
+  };
+
+  const currentImgPath = () => {
+    if (ownImageSrc) return ownImageSrc;
+    const imgData = memeData[currentMemeIdx];
+    if (imgData) return imgData.url;
+    else return "";
+  };
+
+  return (
+    <>
+    <Box sx={{display: 'flex',
+          alignItems:'center',
+          flexDirection: 'column',
+          marginTop: '32px',
+          marginLeft: '32px'}}>
+        <Typography variant="h6" gutterBottom component="div">Create your meme.</Typography>
+        <Typography variant="h6" gutterBottom component="div">
+            You can use random image or your own one. Just Drag 'n' drop your image file over the picture.
+        </Typography>
+    </Box>
+       
+    <Box sx={{
+          display: 'flex',
+          width: '90%',
+          flexDirection: 'row',
+          marginTop: '32px',
+          marginLeft: '32px'
+      }}>
+          <Box sx={{
+              display: 'flex',
+              flexDirection: 'column'
+          }}>
+
+              <TextField id="outlined-basic" label="Text Top" variant="outlined"
+                  type="text"
+                  name="topText"
+                  onChange={(e) => handleTextChange(e.target.value, 0)}
+                  style={{
+                      marginBottom: '16px',
+                      marginRight: '16px'
+                  }} />
+              <TextField id="outlined-basic" label="Text Bottom" variant="outlined"
+                  type="text"
+                  name="topText"
+                  onChange={(e) => handleTextChange(e.target.value, 1)}
+                  style={{
+                      marginBottom: '16px',
+                      marginRight: '16px'
+                  }} />
+                <Stack className="navigation" spacing={2} direction="row">
+                    <Button onClick={onPrev}>Previous</Button>
+                    <Button onClick={onRandom} variant="text">Random</Button>
+                    <Button onClick={onNext}>Next</Button>
+                </Stack> 
+                <Button onClick={onExport}>Export meme image</Button>
+          </Box>
+          
+          <Box className="meme" {...getRootProps()}>
+          <input {...getInputProps()} />
+              <label className="meme-text-top">{text[0]}</label>
+              <label className="meme-text-bottom">{text[1]}</label>
+              <img src={currentImgPath()} alt="Meme" />
+          </Box>
+          <Box>
+              
+              
+          </Box>
+      </Box>
+      
+      </>
+        
+  );
 }
 
 export default MemeGenerator;
