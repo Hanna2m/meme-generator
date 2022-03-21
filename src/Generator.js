@@ -11,7 +11,7 @@ import { Stack, Typography } from "@mui/material";
 function MemeGenerator() {
   const [currentMemeIdx, setCurrentMemeIdx] = useState(0);
   const [memeData, setMemeData] = useState([]);
-  const [text, setText] = useState(["Sample text 1", "Sample text 2"]);
+  const [text, setText] = useState(["Text Top", "Text Bottom"]);
   const [ownImageSrc, setOwnImageSrc] = useState("");
 
   const getMemeData = () => {
