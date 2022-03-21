@@ -126,7 +126,7 @@ function MemeGenerator() {
                 <Button onClick={onExport}>Export meme image</Button>
           </Box>
           
-          <Box className="meme" {...getRootProps()}>
+          <Box id="img-container" className="meme" {...getRootProps()}>
           <input {...getInputProps()} />
               <label className="meme-text-top">{text[0]}</label>
               <label className="meme-text-bottom">{text[1]}</label>

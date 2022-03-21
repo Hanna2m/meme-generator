@@ -64,6 +64,6 @@ header {
   bottom: 64px;
 }
 
-.meme > .meme-text-bottom {
+.meme > .meme-text-top {
   top: 64px;
 }
